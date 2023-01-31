@@ -22,3 +22,5 @@ combinator single char: fn(String) -> Option<String>
 - add any but pattern
 - rename type match to pattern
 - change the pattern from Result to Option
+---
+- add alias/trait to parser and pattern

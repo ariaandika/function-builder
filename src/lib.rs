@@ -9,8 +9,11 @@ Multi Word Parser: fn(iter: Chars) -> Result<(iter, result),notfound>
 
 */
 
-// trait Parser: FnOnce(char) -> Result<char,char> {}
-// impl<T: FnOnce(char) -> Result<char,char>> Parser for T {}
+pub trait Pattern: Fn(char) -> Option<char> {}
+impl<T: Fn(char) -> Option<char>> Pattern for T {}
+
+pub trait Parser: Fn(Chars) -> Option<String> {}
+impl<T: Fn(Chars) -> Option<String>> Parser for T {}
 
 use std::str::Chars;
 #[test]
@@ -34,7 +37,7 @@ fn test() {
     assert_eq!(match_word_or_number(iter), Some("more12and4".to_string()));
 }
 
-pub enum Patterns {
+pub enum PatternType {
     Word(char),
     Number(char),
     Space(char),
@@ -72,36 +75,36 @@ pub fn any_line(ch: char) -> Option<char> {
     if ch != '\n' { Some(ch) } else { None }
 }
 
-pub fn literal(target: char) -> impl Fn(char) -> Option<char> {
+pub fn literal(target: char) -> impl Pattern {
     move |ch| { if ch == target { Some(ch) } else { None } }
 }
 
-pub fn any_but(target: char) -> impl Fn(char) -> Option<char> {
+pub fn any_but(target: char) -> impl Pattern {
     move |ch| { if ch != target { Some(ch) } else { None } }
 }
 
-pub fn any_but_pattern<T>(pattern: T) -> impl Fn(char) -> Option<char>
+pub fn any_but_pattern<T>(pattern: T) -> impl Pattern
 where
-    T: Fn(char) -> Option<char>,
+    T: Pattern,
 {
     move |ch| { if let None = pattern(ch) { Some(ch) } else { None } }
 }
 
 
-pub fn or<T, U>(pattern1: T, pattern2: U) -> impl Fn(char) -> Option<char>
+pub fn or<T, U>(pattern1: T, pattern2: U) -> impl Pattern
 where
-    T: Fn(char) -> Option<char>,
-    U: Fn(char) -> Option<char>,
+    T: Pattern,
+    U: Pattern,
 {
     move |ch| { if let Some(_) = pattern1(ch) { Some(ch) } else if let Some(_) = pattern2(ch) { Some(ch) } else { None } }
 }
 
 
-pub fn one<T>(pattern: T) -> impl Fn(Chars) -> Option<String>
+pub fn one<T>(pattern: T) -> impl Parser
 where
-    T: Fn(char) -> Option<char>,
+    T: Pattern,
 {
-    move |mut input| {
+    move |mut input: Chars| {
         if let Some(ch) = input.next() {
             if let Some(_) = pattern(ch) {
                 return Some(ch.to_string());
@@ -111,11 +114,11 @@ where
     }
 }
 
-pub fn one_or_more<T>(pattern: T) -> impl Fn(Chars) -> Option<String>
+pub fn one_or_more<T>(pattern: T) -> impl Parser
 where
-    T: Fn(char) -> Option<char>,
+    T: Pattern,
 {
-    move |mut input| {
+    move |mut input: Chars| {
         let mut state = String::new();
 
         while let Some(ch) = input.next() {

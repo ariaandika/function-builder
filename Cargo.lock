@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "function-builder"
+name = "function_builder"
 version = "0.1.0"

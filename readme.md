@@ -4,8 +4,8 @@ parser based on function builder pattern
 # How to ❔
 ```rust
 // define a parser
-// fill args with type matching
-// or use combinator to match multiple type matching
+// fill args with pattern
+// or use combinator to match multiple pattern
 let word_number = "more12and4 and then2";
 let iter = word_number.chars();
 
@@ -15,13 +15,15 @@ assert_eq!( match_word_or_number(iter), Some("more12and4".to_string()) );
 ```
 
 # Builder 🛠
-## Type matching
+## Pattern
 - word
 - number
 - space
+- operator
 - any_line
-- any_but()
 - literal()
+- any_but()
+- any_but_pattern()
 
 ## Combinator
 - or

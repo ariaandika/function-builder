@@ -11,8 +11,14 @@ all parser have same type, accept iterator then return the result and the iterat
 
 ## variant type parser ⚓
 single char matching parser: fn(Chars) -> Result<char,char>
+
 combinator single char: fn(String) -> Option<String>
 
 ❌ Problem: creating iterator for each parser is expensive
 
 
+---
+- add operator pattern
+- add any but pattern
+- rename type match to pattern
+- change the pattern from Result to Option
